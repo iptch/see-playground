@@ -9,13 +9,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class HelloControllerTest {
+class HelloControllerTest {
 
     @Autowired
     private MockMvc mvc;
@@ -24,7 +23,7 @@ public class HelloControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    public void getHello() throws Exception {
+    void getHello() throws Exception {
         String expectedGreeting = objectMapper.writeValueAsString(new Greeting(1, "Hello, ipt"));
 
         mvc.perform(MockMvcRequestBuilders.get("/hello").param("name", "ipt").accept(MediaType.APPLICATION_JSON))
