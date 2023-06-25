@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -21,6 +22,13 @@ class HelloControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Test
+    void getIndex() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.get("/"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(equalTo("Hello world!")));
+    }
 
     @Test
     void getHello() throws Exception {
