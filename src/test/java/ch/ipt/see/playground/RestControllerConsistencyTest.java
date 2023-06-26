@@ -36,6 +36,8 @@ class RestControllerConsistencyTest  {
                 }
             }
         }
-        assertThat(invalidPaths, is(empty()));
+        if (!invalidPaths.isEmpty()) {
+            throw new AssertionError("The following endpoint paths contain a character that's not alphanumeric, a forward slashes or a dash (-)\n"+invalidPaths);
+        }
     }
 }
