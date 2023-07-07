@@ -1,0 +1,203 @@
+Subject: [PATCH] SEE-3: implement code review findings
+---
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/pom.xml b/pom.xml
+--- a/pom.xml	(revision d91968b1dc5eaf34c705f5aab4064aa671673715)
++++ b/pom.xml	(revision 69492d8de1020c1952151d188b221cae1243b756)
+@@ -23,6 +23,10 @@
+ 			<groupId>org.springframework.boot</groupId>
+ 			<artifactId>spring-boot-starter-web</artifactId>
+ 		</dependency>
++		<dependency>
++			<groupId>com.fasterxml.jackson.dataformat</groupId>
++			<artifactId>jackson-dataformat-xml</artifactId>
++		</dependency>
+ 
+ 		<dependency>
+ 			<groupId>org.springframework.boot</groupId>
+Index: src/main/java/ch/ipt/see/playground/Calculation.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ch/ipt/see/playground/Calculation.java b/src/main/java/ch/ipt/see/playground/Calculation.java
+new file mode 100644
+--- /dev/null	(revision 69492d8de1020c1952151d188b221cae1243b756)
++++ b/src/main/java/ch/ipt/see/playground/Calculation.java	(revision 69492d8de1020c1952151d188b221cae1243b756)
+@@ -0,0 +1,30 @@
++package ch.ipt.see.playground;
++
++import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
++import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
++import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
++
++import java.util.List;
++
++@JacksonXmlRootElement(localName = "calculation")
++public class Calculation {
++    @JacksonXmlElementWrapper(useWrapping = false)
++    private List<Side> side;
++
++    private Calculation() {}
++
++    public List<Side> getSides() {
++        return this.side;
++    }
++
++    public static class Side {
++        @JacksonXmlProperty(isAttribute = true, localName = "length")
++        private long length;
++
++        private Side() {}
++
++        public long getLength() {
++            return length;
++        }
++    }
++}
+\ No newline at end of file
+Index: src/main/java/ch/ipt/see/playground/CalculationResult.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ch/ipt/see/playground/CalculationResult.java b/src/main/java/ch/ipt/see/playground/CalculationResult.java
+new file mode 100644
+--- /dev/null	(revision 69492d8de1020c1952151d188b221cae1243b756)
++++ b/src/main/java/ch/ipt/see/playground/CalculationResult.java	(revision 69492d8de1020c1952151d188b221cae1243b756)
+@@ -0,0 +1,9 @@
++package ch.ipt.see.playground;
++
++import com.fasterxml.jackson.annotation.JsonInclude;
++import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
++
++@JacksonXmlRootElement(localName = "calculation")
++public record CalculationResult(@JsonInclude(JsonInclude.Include.NON_NULL) Long result,
++                                @JsonInclude(JsonInclude.Include.NON_NULL) String error) {
++}
+\ No newline at end of file
+Index: src/main/java/ch/ipt/see/playground/MathController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ch/ipt/see/playground/MathController.java b/src/main/java/ch/ipt/see/playground/MathController.java
+--- a/src/main/java/ch/ipt/see/playground/MathController.java	(revision d91968b1dc5eaf34c705f5aab4064aa671673715)
++++ b/src/main/java/ch/ipt/see/playground/MathController.java	(revision 69492d8de1020c1952151d188b221cae1243b756)
+@@ -1,54 +1,30 @@
+ package ch.ipt.see.playground;
+ 
+-import org.springframework.http.HttpStatus;
+ import org.springframework.http.MediaType;
+ import org.springframework.http.ResponseEntity;
+ import org.springframework.web.bind.annotation.PostMapping;
+ import org.springframework.web.bind.annotation.RequestBody;
+ import org.springframework.web.bind.annotation.RestController;
+-import org.w3c.dom.Document;
+-import org.w3c.dom.Element;
+-import org.w3c.dom.NodeList;
+-import org.xml.sax.SAXException;
+-
+-import javax.xml.parsers.DocumentBuilder;
+-import javax.xml.parsers.DocumentBuilderFactory;
+-import javax.xml.parsers.ParserConfigurationException;
+-import java.io.ByteArrayInputStream;
+-import java.io.IOException;
+-import java.nio.charset.StandardCharsets;
+ 
+ @RestController
+ public class MathController {
+-    private final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+ 
+     @PostMapping(
+-            path = "/math/area_computation/hyperrectangle",
++            path = "/math/volume-computation/hyperrectangle",
+             consumes = MediaType.APPLICATION_XML_VALUE,
+             produces = MediaType.APPLICATION_XML_VALUE
+     )
+-    public ResponseEntity<String> calculateRectangleArea(@RequestBody String input) {
+-        Document document;
+-        try {
+-            DocumentBuilder documentBuilder = factory.newDocumentBuilder();
+-            document = documentBuilder.parse(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
+-        } catch (ParserConfigurationException | SAXException | IOException e) {
+-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("<error>Could not parse input</error>");
++    public ResponseEntity<CalculationResult> calculateHyperrectangleVolume(@RequestBody Calculation calculation) {
++        if (calculation.getSides().size() < 2) {
++            CalculationResult result = new CalculationResult(null, "Hyperrectangle must have at least two sides");
++            return ResponseEntity.badRequest().body(result);
+         }
+ 
+-        NodeList sideElements = document.getElementsByTagName("side");
+-        int numberOfSides = sideElements.getLength();
+-
+-        if (numberOfSides < 2) {
+-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("<error>Needs at least two sides</error>");
++        Long volume = null;
++        for (Calculation.Side side : calculation.getSides()) {
++            volume = volume == null ? side.getLength() : volume*side.getLength();
+         }
+ 
+-        Long area = null;
+-        for (int i = 0; i < numberOfSides; i++) {
+-            Element sideElement = (Element) sideElements.item(i);
+-            Long length = Long.valueOf(sideElement.getAttribute("length"));
+-            area = area == null ? length : area * length;
+-        }
+-        return ResponseEntity.ok("<calculation><area>"+area+"</area></calculation>");
++        return ResponseEntity.ok(new CalculationResult(volume, null));
+     }
+ }
+\ No newline at end of file
+Index: src/test/java/ch/ipt/see/playground/MathControllerTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/ch/ipt/see/playground/MathControllerTest.java b/src/test/java/ch/ipt/see/playground/MathControllerTest.java
+--- a/src/test/java/ch/ipt/see/playground/MathControllerTest.java	(revision d91968b1dc5eaf34c705f5aab4064aa671673715)
++++ b/src/test/java/ch/ipt/see/playground/MathControllerTest.java	(revision 69492d8de1020c1952151d188b221cae1243b756)
+@@ -19,22 +19,31 @@
+     private MockMvc mvc;
+ 
+     @Test
+-    void calculateRectangleArea_twoDimensional() throws Exception {
+-        mvc.perform(MockMvcRequestBuilders.post("/math/area_computation/hyperrectangle")
++    void calculateHyperrectangleVolume_twoDimensional() throws Exception {
++        mvc.perform(MockMvcRequestBuilders.post("/math/volume-computation/hyperrectangle")
+                         .content("<calculation><side length=\"4\"/><side length=\"8\"/></calculation>")
+                         .contentType(MediaType.APPLICATION_XML)
+                 )
+                 .andExpect(status().isOk())
+-                .andExpect(content().xml("<calculation><area>32</area></calculation>"));
++                .andExpect(content().xml("<calculation><result>32</result></calculation>"));
+     }
+ 
+     @Test
+-    void calculateRectangleArea_threeDimensional() throws Exception {
+-        mvc.perform(MockMvcRequestBuilders.post("/math/area_computation/hyperrectangle")
++    void calculateHyperrectangleVolume_threeDimensional() throws Exception {
++        mvc.perform(MockMvcRequestBuilders.post("/math/volume-computation/hyperrectangle")
+                         .content("<calculation><side length=\"4\"/><side length=\"8\"/><side length=\"2\"/></calculation>")
+                         .contentType(MediaType.APPLICATION_XML)
+                 )
+                 .andExpect(status().isOk())
+-                .andExpect(content().xml("<calculation><area>64</area></calculation>"));
++                .andExpect(content().xml("<calculation><result>64</result></calculation>"));
+     }
+-}
++
++    @Test
++    void calculateHyperrectangleVolume_oneDimensional_returnsError() throws Exception {
++        mvc.perform(MockMvcRequestBuilders.post("/math/volume-computation/hyperrectangle")
++                        .content("<calculation><side length=\"4\"/></calculation>")
++                        .contentType(MediaType.APPLICATION_XML)
++                )
++                .andExpect(status().isBadRequest());
++    }
++}
+\ No newline at end of file

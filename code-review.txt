@@ -1,0 +1,31 @@
+super, dass Du Testfälle dafür geschrieben hast! :+1:
+
+
+ich denke ein weiterer Testfall für den error-Case wäre nützlich
+
+
+Ich denke es wäre besser, Framework-Features zum Parsen und Generieren von XML zu verwenden. Damit wäre der Code typesafe und auch die von CodeQL gefundene XML external entity-Vulnerability gleich erledigt.
+Siehe
+- https://docs.spring.io/spring-boot/docs/1.4.0.M3/reference/html/howto-spring-mvc.html
+- https://stackify.com/java-xml-jackson/
+
+
+gemäss https://ipt-training.atlassian.net/browse/SEE-3 müsste der Endpoint `/math/volume-computation/hyperrectangle` heissen
+```suggestion
+            path = "/math/volume-computation/hyperrectangle",
+```
+
+
+Vorschlag: umbenennen
+```suggestion
+    public ResponseEntity<String> calculateHyperrectangleVolume(@RequestBody String input) {
+```
+
+
+Gemäss https://ipt-training.atlassian.net/browse/SEE-3 sollte das resultierende XML ein `<result>` statt ein `<area>`-Element haben
+```suggestion
+                .andExpect(content().xml("<calculation><result>32</result></calculation>"));
+```
+
+
+Gute Arbeit! Ich habe ein paar Dinge gefunden, die Du noch anschauen solltest. Dann kann gemerged werden
