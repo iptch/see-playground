@@ -1,0 +1,18 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="MathControllerTest" type="JUnit" factoryName="JUnit" nameIsGenerated="true">
+    <module name="playground" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="ch.ipt.see.playground.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <option name="PACKAGE_NAME" value="ch.ipt.see.playground" />
+    <option name="MAIN_CLASS_NAME" value="ch.ipt.see.playground.MathControllerTest" />
+    <option name="METHOD_NAME" value="" />
+    <option name="TEST_OBJECT" value="class" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
