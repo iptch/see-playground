@@ -1,88 +1,32 @@
+# Vorbereitung
+- Git Repository auschecken, in IntelliJ öffnen
+  - Notizen auschecken (Branch `notes`, Folder `notes`): https://github.com/iptch/see-playground/tree/notes/notes
+- Run Configs 
+  - `PlaygroundApplication` 
+  - und `All in playground` laufen lassen, um zu prüfen, dass alles funktioniert
+- Rolle "Developer" vorbereiten
+  - github.com Repo in Browser öffnen: https://github.com/iptch/see-playground/
+  - sonarcloud.com in Browser öffnen: https://sonarcloud.io/projects
+  - JIRA öffnen: https://ipt-training.atlassian.net/jira/software/projects/SEE/boards/1/backlog
+    - Sprint Startdaten anpassen
+- Rolle "Reviewer" (Gill Bates) vorbereiten (Incognito/private Browser)
+  - github.com Repo in Browser öffnen, *einloggen*: https://github.com/iptch/see-playground/
+  - JIRA öffnen: https://ipt-training.atlassian.net/jira/software/projects/SEE/boards/1
+
 # Einstieg JIRA
-- Backlog / Sprints zeigen
+- Sprints zeigen (aktueller, zukünftige)
+  - Stories, Schätzungen
 - Sprint Backlog zeigen
 - Story zeigen, assignen, in implementation ziehen
   - DoD
 
 # IntelliJ starten
-- MathController implementieren
-```java
-@RestController
-public class MathController {
-    private final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-
-    @PostMapping(
-            path = "/math/area_computation/hyperrectangle",
-            consumes = MediaType.APPLICATION_XML_VALUE,
-            produces = MediaType.APPLICATION_XML_VALUE
-    )
-    public ResponseEntity<String> calculateRectangleArea(@RequestBody String input) {
-        Document document;
-        try {
-            DocumentBuilder documentBuilder = factory.newDocumentBuilder();
-            document = documentBuilder.parse(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
-        } catch (ParserConfigurationException | SAXException | IOException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("<error>Could not parse input</error>");
-        }
-
-        NodeList sideElements = document.getElementsByTagName("side");
-        int numberOfSides = sideElements.getLength();
-
-        if (numberOfSides < 2) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("<error>Needs at least two sides</error>");
-        }
-
-        Long area = null;
-        for (int i = 0; i < numberOfSides; i++) {
-            Element sideElement = (Element) sideElements.item(i);
-            Long length = Long.valueOf(sideElement.getAttribute("length"));
-            area = area == null ? length : area * length;
-        }
-        return ResponseEntity.ok("<calculation><area>"+area+"</area></calculation>");
-    }
-}
-```
-
-```java
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-@SpringBootTest
-@AutoConfigureMockMvc
-class MathControllerTest {
-
-  @Autowired
-  private MockMvc mvc;
-
-  @Test
-  void calculateRectangleArea_twoDimensional() throws Exception {
-    mvc.perform(MockMvcRequestBuilders.post("/math/area_computation/hyperrectangle")
-                    .content("<calculation><side length=\"4\"/><side length=\"8\"/></calculation>")
-                    .contentType(MediaType.APPLICATION_XML)
-            )
-            .andExpect(status().isOk())
-            .andExpect(content().xml("<calculation><area>32</area></calculation>"));
-  }
-
-  @Test
-  void calculateRectangleArea_threeDimensional() throws Exception {
-    mvc.perform(MockMvcRequestBuilders.post("/math/area_computation/hyperrectangle")
-                    .content("<calculation><side length=\"4\"/><side length=\"8\"/><side length=\"2\"/></calculation>")
-                    .contentType(MediaType.APPLICATION_XML)
-            )
-            .andExpect(status().isOk())
-            .andExpect(content().xml("<calculation><area>64</area></calculation>"));
-  }
-}
-```
+- Prüfen/zeigen, dass Workspace funktionsfähig ist:
+  - Applikation starten (Run Config `PlaygroundApplication`)
+    - http://localhost:8080/hello?name=test öffnen
+  - Tests ausführen (Run Config `All in playground`)
+- Ctrl+Shift+A - Apply patch: `notes/SEE-3__00__Implement_hyperrectangle_volume_computation.patch`
+- Lokal tests ausführen: Run Config `MathControllerTest`
 - mit curl testen lokal
 ```shell
 curl --header 'Content-Type: application/xml' -d '<calculation><side length="4"/><side length="8"/></calculation>' localhost:8080/math/area_computation/hyperrectangle && echo
@@ -90,128 +34,27 @@ curl --header 'Content-Type: application/xml' -d '<calculation><side length="4"/
 - Story in Review setzen
 - PR erstellen
   - CI-Lauf abwarten
+    - kurzer Refresher warum CI, was gehört alles dazu, was kann man damit machen?
+    - CI-Resultate anschauen (ggf. nach Review machen, falls CI-Lauf zu lange dauert)
+      - Tests
+      - statische Analyse CodeQL
+      - statische Analyse SonarQube
+        - kurz zeigen, was Sonar bietet (Coverage, Code Smells, etc.)
   - Reviewer zuweisen
-    - Lob für Tests
-    - fehlender Testfall
-    - XML-Parsing mit Framework lösen
-    - endpoint-path falsch benannt
-    - naming methoden
-    - xml resultat struktur
-  - CI-Resultate anschauen
-    - Tests
-    - statische Analyse CodeQL
-    - statische Analyse SonarQube
+  - In der Rolle des "Reviewers" (Reviewer-Browserfenster öffnen)
+    - siehe [code-review.txt](code-review.txt)
+      - Lob für Tests
+      - fehlender Testfall
+      - XML-Parsing mit Framework lösen
+      - endpoint-path falsch benannt
+      - naming methoden
+      - xml resultat struktur
 
 # Review-Findings umsetzen
-```java
-package ch.ipt.see.playground;
+- Story wieder in Bearbeitung ziehen, mir selbst zuweisen
+- Ctrl+Shift+A - Apply patch: `notes/SEE-3__01__implement_code_review_findings.patch`
 
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
-@RestController
-public class MathController {
-
-    @PostMapping(
-            path = "/math/volume-computation/hyperrectangle",
-            consumes = MediaType.APPLICATION_XML_VALUE,
-            produces = MediaType.APPLICATION_XML_VALUE
-    )
-    public ResponseEntity<CalculationResult> calculateHyperrectangleVolume(@RequestBody Calculation calculation) {
-        if (calculation.getSides().size() < 2) {
-            CalculationResult result = new CalculationResult(null, "Hyperrectangle must have at least two sides");
-            return ResponseEntity.badRequest().body(result);
-        }
-
-        Long volume = null;
-        for (Calculation.Side side : calculation.getSides()) {
-            volume = volume == null ? side.getLength() : volume*side.getLength();
-        }
-
-        return ResponseEntity.ok(new CalculationResult(volume, null));
-    }
-}
-```
-```xml
-		<dependency>
-			<groupId>com.fasterxml.jackson.dataformat</groupId>
-			<artifactId>jackson-dataformat-xml</artifactId>
-		</dependency>
-```
-```java
-@JacksonXmlRootElement(localName = "calculation")
-public class Calculation {
-    @JacksonXmlElementWrapper(useWrapping = false)
-    private List<Side> side;
-
-    private Calculation() {}
-
-    public List<Side> getSides() {
-        return this.side;
-    }
-
-    public static class Side {
-        @JacksonXmlProperty(isAttribute = true, localName = "length")
-        private long length;
-
-        private Side() {}
-
-        public long getLength() {
-            return length;
-        }
-    }
-}
-```
-```java
-@JacksonXmlRootElement(localName = "calculation")
-public record CalculationResult(@JsonInclude(JsonInclude.Include.NON_NULL) Long result,
-                                @JsonInclude(JsonInclude.Include.NON_NULL) String error) {
-}
-```
-
-```java
-@SpringBootTest
-@AutoConfigureMockMvc
-class MathControllerTest {
-
-    @Autowired
-    private MockMvc mvc;
-
-    @Test
-    void calculateHyperrectangleVolume_twoDimensional() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/math/volume-computation/hyperrectangle")
-                        .content("<calculation><side length=\"4\"/><side length=\"8\"/></calculation>")
-                        .contentType(MediaType.APPLICATION_XML)
-                )
-                .andExpect(status().isOk())
-                .andExpect(content().xml("<calculation><result>32</result></calculation>"));
-    }
-
-    @Test
-    void calculateHyperrectangleVolume_threeDimensional() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/math/volume-computation/hyperrectangle")
-                        .content("<calculation><side length=\"4\"/><side length=\"8\"/><side length=\"2\"/></calculation>")
-                        .contentType(MediaType.APPLICATION_XML)
-                )
-                .andExpect(status().isOk())
-                .andExpect(content().xml("<calculation><result>64</result></calculation>"));
-    }
-
-    @Test
-    void calculateHyperrectangleVolume_oneDimensional_returnsError() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/math/volume-computation/hyperrectangle")
-                        .content("<calculation><side length=\"4\"/></calculation>")
-                        .contentType(MediaType.APPLICATION_XML)
-                )
-                .andExpect(status().isBadRequest());
-    }
-}
-```
-
-# erneutes Review
+# erneutes Testing, Review
 - alle Tests laufen lassen lokal
 - manuell testen
 ```shell
@@ -219,14 +62,20 @@ curl --header 'Content-Type: application/xml' -d '<calculation><side length="4"/
 ```
 - pushen
 - CI-Lauf abwarten, erneutes Review anfordern
-- Review OK, praise nicht vergessen
+- In der Rolle des "Reviewers":
+  - Prüfen, ob Review-Findings adressiert wurden
+  - PR approven mit Praise
 
-# JIRA
+# JIRA - Story abschliessen
 - DoD prüfen
 - Story auf abgeschlossen setzen
 
-# weiteres
+# weiteres, was ggf. zur Story gehört
 - Dokumentation nachführen, Release Notes ergänzen
 - Spezifikation ergänzen
 - Testing durch API-Consumer
 - deployen & live testen
+
+# Cleanup
+- Branch lokal und auf GitHub löschen (PR wird geclosed)
+- JIRA Story unassignen, auf `TO DO` schieben
