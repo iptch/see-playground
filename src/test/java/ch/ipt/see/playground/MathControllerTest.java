@@ -19,22 +19,31 @@ class MathControllerTest {
     private MockMvc mvc;
 
     @Test
-    void calculateRectangleArea_twoDimensional() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/math/area_computation/hyperrectangle")
+    void calculateHyperrectangleVolume_twoDimensional() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/math/volume-computation/hyperrectangle")
                         .content("<calculation><side length=\"4\"/><side length=\"8\"/></calculation>")
                         .contentType(MediaType.APPLICATION_XML)
                 )
                 .andExpect(status().isOk())
-                .andExpect(content().xml("<calculation><area>32</area></calculation>"));
+                .andExpect(content().xml("<calculation><result>32</result></calculation>"));
     }
 
     @Test
-    void calculateRectangleArea_threeDimensional() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/math/area_computation/hyperrectangle")
+    void calculateHyperrectangleVolume_threeDimensional() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/math/volume-computation/hyperrectangle")
                         .content("<calculation><side length=\"4\"/><side length=\"8\"/><side length=\"2\"/></calculation>")
                         .contentType(MediaType.APPLICATION_XML)
                 )
                 .andExpect(status().isOk())
-                .andExpect(content().xml("<calculation><area>64</area></calculation>"));
+                .andExpect(content().xml("<calculation><result>64</result></calculation>"));
+    }
+
+    @Test
+    void calculateHyperrectangleVolume_oneDimensional_returnsError() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/math/volume-computation/hyperrectangle")
+                        .content("<calculation><side length=\"4\"/></calculation>")
+                        .contentType(MediaType.APPLICATION_XML)
+                )
+                .andExpect(status().isBadRequest());
     }
 }
