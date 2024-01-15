@@ -1,0 +1,323 @@
+{
+	"info": {
+		"_postman_id": "39126f2d-858e-4acd-ba75-62c60fd2d556",
+		"name": "SEE PD",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "collection 1",
+			"item": [
+				{
+					"name": "Hello World",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Hello World {name}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/hello?name=ipt",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"hello"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "ipt"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST hyperrectangle 1",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "<calculation>\r\n    <side length=\"4\"/>\r\n    <side length=\"8\"/>\r\n</calculation>",
+							"options": {
+								"raw": {
+									"language": "xml"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/math/area_computation/hyperrectangle",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"math",
+								"area_computation",
+								"hyperrectangle"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST hyperrectangle 1 error - one side",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "<calculation>\r\n    <side length=\"4\"/>\r\n</calculation>",
+							"options": {
+								"raw": {
+									"language": "xml"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/math/area_computation/hyperrectangle",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"math",
+								"area_computation",
+								"hyperrectangle"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST hyperrectangle 1 error - parse",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "<calculation>\r\n    <side length=\"4\"\r\n    <side length=\"8\"/>\r\n</calculation>",
+							"options": {
+								"raw": {
+									"language": "xml"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/math/area_computation/hyperrectangle",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"math",
+								"area_computation",
+								"hyperrectangle"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "collection 2",
+			"item": [
+				{
+					"name": "POST hyperrectangle 1 - decimal",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "<calculation>\r\n    <side length=\"4\"/>\r\n    <side length=\"8.5\"/>\r\n</calculation>",
+							"options": {
+								"raw": {
+									"language": "xml"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/math/area_computation/hyperrectangle",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"math",
+								"area_computation",
+								"hyperrectangle"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST hyperrectangle 2",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "<calculation>\r\n    <side length=\"4\"/>\r\n    <side length=\"8\"/>\r\n</calculation>",
+							"options": {
+								"raw": {
+									"language": "xml"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/math/volume-computation/hyperrectangle",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"math",
+								"volume-computation",
+								"hyperrectangle"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST hyperrectangle 2 error - one side",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "<calculation>\r\n    <side length=\"4\"/>\r\n</calculation>",
+							"options": {
+								"raw": {
+									"language": "xml"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/math/volume-computation/hyperrectangle",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"math",
+								"volume-computation",
+								"hyperrectangle"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST hyperrectangle 2 error - parse",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "<calculation>\r\n    <side length=\"4\"\r\n    <side length=\"8\"/>\r\n</calculation>",
+							"options": {
+								"raw": {
+									"language": "xml"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/math/volume-computation/hyperrectangle",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"math",
+								"volume-computation",
+								"hyperrectangle"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST hyperrectangle 2 error - decimal",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "<calculation>\r\n    <side length=\"4\"/>\r\n    <side length=\"8.5\"/>\r\n</calculation>",
+							"options": {
+								"raw": {
+									"language": "xml"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/math/volume-computation/hyperrectangle",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"math",
+								"volume-computation",
+								"hyperrectangle"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	]
+}
